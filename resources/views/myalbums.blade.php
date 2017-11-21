@@ -20,10 +20,12 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td><a href="{{ route('editAlbum', ['number' => 1]) }}">Rilnt <sup>edit</sup></a></td>
-                        <td>2016</td>
-                    </tr>
+                    @foreach($albums as $album)
+                        <tr>
+                            <td><a href="{{ route('editAlbum', ['number' => $album->album_id]) }}">{{ $album->album_name }} <sup>edit</sup></a></td>
+                            <td>{{ $album->album_year }}</td>
+                        </tr>
+                    @endforeach
                     </tbody>
                 </table>
             </div>

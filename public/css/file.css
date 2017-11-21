@@ -29,3 +29,49 @@ div.input-file-wrapper {
 .input-file-wrapper .file {
     display: none;
 }
+#delete {
+    float: right;
+    width: 20px;
+    height: 20px;
+    background-image: url("images/delete.png");
+    background-repeat: no-repeat;
+    background-size: 100%;
+    cursor: pointer;
+}
+#delete:active {
+    box-shadow: grey 0.5px -0.5px 0.5px;
+}
+#deleteAlbum {
+    border: solid grey 1px;
+    border-radius: 5px;
+    height: 130px;
+    width: 500px;
+    text-align: center;
+    position: fixed;
+    top: 30%;
+    left: 30%;
+    background-color: lightgrey;
+    display: none;
+    box-shadow: grey 2px 2px 2px;
+}
+#YesNo {
+    margin-left: 180px;
+}
+#Yes, #No {
+    cursor: pointer;
+    border: solid grey 1px;
+    width: 35px;
+    height: 35px;
+    float: left;
+    margin-right: 40px;
+    text-align: center;
+    border-radius: 5px;
+    color: lightblue;
+    background-color: grey;
+}
+#No {
+    padding-top: 6px;
+}
+#newTrack {
+    display: none;
+}

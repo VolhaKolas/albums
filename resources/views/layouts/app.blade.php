@@ -101,5 +101,6 @@
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/addTrackForm.js') }}"></script>
+    <script src="{{ asset('js/deleteAlbumForm.js') }}"></script>
 </body>
 </html>

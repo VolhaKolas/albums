@@ -22,6 +22,8 @@ Route::group(['middleware' => ['auth']], function($router) {
     $router->get('/myAlbums', 'MyAlbumsController@index')->name('myAlbums');
     $router->get('/newAlbum', 'NewAlbumController@index')->name('newAlbum');
     $router->post('/newAlbum', 'NewAlbumController@post')->name('newAlbum');
-    $router->get('/editAlbum', 'EditAlbumController@index')->name('editAlbum');
     $router->post('/tracksCount', 'TracksCountController@post')->name('trackCount');
+    $router->get('/editAlbum', 'EditAlbumController@index')->name('editAlbum');
+    $router->post('/editAlbum', 'EditAlbumController@post')->name('editAlbum');
+    $router->post('/deleteAlbum', 'DeleteAlbumController@post')->name('deleteAlbum');
 });

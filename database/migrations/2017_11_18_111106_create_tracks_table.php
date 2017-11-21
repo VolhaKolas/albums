@@ -17,9 +17,9 @@ class CreateTracksTable extends Migration
             $table->increments('track_id');
             $table->integer('album_id')->length(10)->unsigned();
             $table->foreign('album_id')->references('album_id')->on('albums')->onDelete('cascade')->onUpdate('cascade');
-            $table->string('track_path', 10);
+            $table->string('track_path', 50);
             $table->string('track_name', 100);
-            $table->integer('track_duration');
+            $table->string('track_duration', 10);
         });
     }
 

@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Track extends Model
 {
+    protected $fillable = [
+        'track_id', 'track_name', 'track_duration', 'track_path'
+    ];
+
     protected $primaryKey = 'album_id';
 
     public function album() {
