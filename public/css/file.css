@@ -1,0 +1,31 @@
+.border {
+    border: solid 1px lightgrey;
+    border-radius: 5px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    padding: 5px;
+}
+#one-more-track {
+    cursor: pointer;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
+}
+#one-more-track:active {
+    text-shadow: grey -1px 0px 0.5px;
+}
+.input-file-wrapper .button {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    background-image: url("images/download.png");
+    background-repeat: no-repeat;
+    background-size: 100%;
+    right: 3.5%;
+}
+div.input-file-wrapper {
+    position: relative;
+}
+.input-file-wrapper .file {
+    display: none;
+}
