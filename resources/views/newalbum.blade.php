@@ -22,11 +22,14 @@
                                         <small>{{ $errors->first('album_year') }}</small>
                                     </span>
                                 @endif
+                                    <!-- input for Album Name   -->
                                 <div class="col-xs-6 col-sm-6 col-md-6">
                                     <div class="form-group">
                                         <input type="text" name="album_name" id="album_name" value="{{ old('album_name') }}" class="form-control input-sm" placeholder="Album Name" />
                                     </div>
                                 </div>
+
+                                    <!-- input for Album Year   -->
                                 <div class="col-xs-6 col-sm-6 col-md-6">
                                     <div class="form-group">
                                         <input type="text" name="album_year" value="{{ old('album_year') }}" id="album_year" class="form-control input-sm" placeholder="Album Year" />
@@ -52,6 +55,8 @@
                                                 <small>{{ $errors->first('track' . $i) }}</small>
                                             </span>
                                         @endif
+
+                                        <!-- input for Track File   -->
                                         <div class="form-group input-file-wrapper">
                                             <div class="button" onclick="this.nextElementSibling.nextElementSibling.click()"></div>
                                             <input type="text" class="form-control input-sm image" onclick="this.nextElementSibling.click()" disabled />
@@ -59,11 +64,14 @@
                                         </div>
 
                                         <div class="row">
+                                            <!-- input for Track Name   -->
                                             <div class="col-xs-6 col-sm-6 col-md-6">
                                                 <div class="form-group">
                                                     <input type="text" name="track_name{{ $i }}" value="{{ old('track_name' . $i) }}" class="form-control input-sm track-name" placeholder="Track Name" />
                                                 </div>
                                             </div>
+
+                                            <!-- input for Performer Name   -->
                                             <div class="col-xs-6 col-sm-6 col-md-6">
                                                 <div class="form-group">
                                                     <input type="text" name="track_performer{{ $i }}" value="{{ old('track_performer' . $i) }}" class="form-control input-sm track-performer" placeholder="Track Performer" />

@@ -39,12 +39,16 @@
                                                 <small>{{ $errors->first('album_year') }}</small>
                                             </span>
                                             @endif
+
+                                            <!-- input for Album Name   -->
                                             <div class="col-xs-6 col-sm-6 col-md-6">
                                                 <div class="form-group">
                                                     <label><small>Album name</small></label>
                                                     <input type="text" name="album_name" id="album_name" class="form-control input-sm" placeholder="Album Name" value="{{ $album->album_name }}" />
                                                 </div>
                                             </div>
+
+                                                <!-- input for Album Year   -->
                                             <div class="col-xs-6 col-sm-6 col-md-6">
                                                 <div class="form-group">
                                                     <label><small>Album Year</small></label>
@@ -67,12 +71,14 @@
                                                     <b class="number">Track {{ $key + 1 }}</b>
                                                     <div class="deleteTrack"><input type="checkbox" name="checkbox{{ $track->track_id }}"/> Delete track</div>
                                                     <div class="row">
+                                                        <!-- input for Track Name   -->
                                                         <div class="col-xs-6 col-sm-6 col-md-6">
                                                             <div class="form-group">
                                                                 <label><small>Track name</small></label>
                                                                 <input type="text" name="track_name{{ $track->track_id }}" class="form-control input-sm" value="{{ $track->track_name }}" placeholder="Track Name" />
                                                             </div>
                                                         </div>
+                                                        <!-- input for Performer Name   -->
                                                         <div class="col-xs-6 col-sm-6 col-md-6">
                                                             <div class="form-group">
                                                                 <label><small>Performer</small></label>
@@ -95,7 +101,7 @@
                                             <b>+</b> Add one more track
                                         </div>
 
-
+                                        <!-- new track   -->
                                             <div class="border" id="newTrack">
                                                 <b class="number">Track {{ $key + 2 }}</b>
                                                 <div class="form-group input-file-wrapper">

@@ -23,7 +23,7 @@ class NewAlbumRequest extends FormRequest
      */
     public function rules()
     {
-        $count = session('count');
+        $count = session('count'); //look at TracksCountController
         if($count >= 1) {
             session(['tracksCount' => $count]);
         }

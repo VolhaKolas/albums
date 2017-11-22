@@ -1,7 +1,7 @@
 angular.module('formApp', [])
     .controller('FormController', ['$scope', '$http', function($scope, $http) {
         var count = angular.element(document.querySelectorAll(".border")).length;
-        $scope.cloneDiv = function () {
+        $scope.cloneDiv = function () { //this method adds on the page new input for loading file
             count++;
             var borderAppend = angular.element(document.querySelector(".border"));
             var wrapper = angular.element(document.querySelector("#wrapper"));
@@ -16,7 +16,7 @@ angular.module('formApp', [])
             border.children().children().children().children('.track-performer').attr('name', 'track_performer' + count);
             border.children().children().children().children('.track-performer').val('');
 
-            $http({
+            $http({ //this method sends to server count of inputs for loading files
                 method : "POST",
                 url : "/tracksCount",
                 data: {'count': count}
