@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Album;
 use App\Classes\PerformerId;
 use App\Http\Requests\EditAlbumRequest;
+use App\M2mPerformerTrack;
 use App\Performer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,9 +16,8 @@ class EditAlbumController extends Controller
     /*
      * method shows form for edit album
      */
-    public function index(Request $request) {
-        $key = -1;
-        $id = $request->all()['number']; //album id
+    public function showEditForm($id) {//album id
+        $key = -1; //used for creation new track, value '-1' - if album doesn't have any tracks
         $album = Album::where('album_id', $id)->select('album_name', 'album_id', 'album_year')->get(); //current album
         if(count($album) > 0) {
             $album = $album[0];
@@ -39,7 +39,7 @@ class EditAlbumController extends Controller
     /*
      * method edits album
      */
-    public function post(EditAlbumRequest $request) {
+    public function editAlbum(EditAlbumRequest $request) {
         $albumId = $request->all()['album_id'];
         $album = new \App\Classes\Album($request->all()['album_name'], $request->all()['album_year'], $albumId);
         $albumName = $album->getAlbumName();
@@ -94,7 +94,7 @@ class EditAlbumController extends Controller
                 ->where('track_duration', $trackDuration)
                 ->pluck('track_id')[0];
 
-            DB::table('m2m_performer_tracks')->insert([ //put data into m2m_performer_tracks table
+            M2mPerformerTrack::insert([ //put data into m2m_performer_tracks table
                 'm2m_performer_track_id' => null,
                 'track_id' => $trackId,
                 'performer_id' => $performerId
@@ -131,5 +131,14 @@ class EditAlbumController extends Controller
                 'album_year' => $albumYear
         ]);
         return redirect()->back();
+    }
+
+    /*
+     * method deletes album
+     */
+    public function delete(Request $request) {
+        $albumId = $request->all()['id'];
+        Album::where('album_id', $albumId)->delete();
+        return redirect()->route('myAlbums');
     }
 }

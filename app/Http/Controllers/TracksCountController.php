@@ -15,7 +15,7 @@ class TracksCountController extends Controller
      * When I trap into NewAlbumController method index, I don't know exactly how user trap here (from post method, or form get).
      * That is why I set into session('tracksCount') value - 1.
      */
-    public function post(Request $request)  {
+    public function count(Request $request)  {
         session(['count' => $request->all()['count']]);
     }
 }

@@ -22,7 +22,7 @@
                     <tbody>
                     @foreach($albums as $album)
                         <tr>
-                            <td><a href="{{ route('editAlbum', ['number' => $album->album_id]) }}">{{ $album->album_name }} <sup>edit</sup></a></td>
+                            <td><a href="{{ action("EditAlbumController@showEditForm", ['album_id' => $album->album_id]) }}">{{ $album->album_name }} <sup>edit</sup></a></td>
                             <td>{{ $album->album_year }}</td>
                         </tr>
                     @endforeach

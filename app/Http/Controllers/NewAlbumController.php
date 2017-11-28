@@ -15,7 +15,7 @@ class NewAlbumController extends Controller
     /*
      * method shows form for creation new album
      */
-    public function index() {
+    public function showNewAlbumForm() {
         $count = 1; //look at TracksCountController
         if(session('count') >= 1) {
             $count = session('tracksCount');
@@ -30,7 +30,7 @@ class NewAlbumController extends Controller
     /*
      * method creates new album
      */
-    public function post(NewAlbumRequest $request) {
+    public function createNewAlbum(NewAlbumRequest $request) {
         session(['tracksCount' => 1]); //look at TracksCountController
         session(['count' => 1]);
 

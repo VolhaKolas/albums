@@ -20,10 +20,10 @@ Route::get('/', 'HomeController@index')->name('home');
 
 Route::group(['middleware' => ['auth']], function($router) {
     $router->get('/myAlbums', 'MyAlbumsController@index')->name('myAlbums');
-    $router->get('/newAlbum', 'NewAlbumController@index')->name('newAlbum');
-    $router->post('/newAlbum', 'NewAlbumController@post')->name('newAlbum');
-    $router->post('/tracksCount', 'TracksCountController@post')->name('trackCount'); //ajax
-    $router->get('/editAlbum', 'EditAlbumController@index')->name('editAlbum');
-    $router->post('/editAlbum', 'EditAlbumController@post')->name('editAlbum');
-    $router->post('/deleteAlbum', 'DeleteAlbumController@post')->name('deleteAlbum');
+    $router->get('/newAlbum', 'NewAlbumController@showNewAlbumForm')->name('newAlbum');
+    $router->post('/newAlbum', 'NewAlbumController@createNewAlbum')->name('newAlbum');
+    $router->post('/tracksCount', 'TracksCountController@count')->name('trackCount'); //ajax
+    $router->get('/editAlbum/{album_id}', ['uses' => 'EditAlbumController@showEditForm']);
+    $router->post('/editAlbum/{album_id}', ['uses' => 'EditAlbumController@editAlbum', 'as' => 'edit.album']);
+    $router->post('/editAlbum/{album_id}/delete', ['uses' => 'EditAlbumController@delete', 'as' => 'delete.album']);
 });

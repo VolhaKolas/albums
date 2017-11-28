@@ -4,7 +4,7 @@
     <div ng-app="deleteApp">
         <div ng-controller="DeleteController">
             <div id="deleteAlbum">
-                <form method="POST" enctype="multipart/form-data" action="{{ route('deleteAlbum') }}">
+                <form method="POST" enctype="multipart/form-data" action="{{ route("delete.album", $album->album_id) }}">
                     {{csrf_field()}}
                     <input type="hidden" value="{{$album->album_id  }}" name="id" />
                     <h3>Are you sure you want to delete album "{{ $album->album_name }}"?</h3>
@@ -25,7 +25,7 @@
                                     <h3 class="panel-title">Edit album "{{ $album->album_name }}"</h3>
                                 </div>
                                 <div class="panel-body">
-                                    <form role="form" id="form" enctype="multipart/form-data" method="POST" action="{{ route('editAlbum') }}">
+                                    <form role="form" id="form" enctype="multipart/form-data" method="POST" action="{{ route("edit.album", $album->album_id) }}">
                                         {{ csrf_field() }}
                                         <input type="hidden" value="{{$album->album_id  }}" name="album_id" />
                                         <div class="row">
