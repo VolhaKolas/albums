@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Album;
 use App\Classes\PerformerId;
 use App\Http\Requests\NewAlbumRequest;
+use App\M2mPerformerTrack;
 use App\Performer;
+use App\Track;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -47,14 +49,14 @@ class NewAlbumController extends Controller
             $albumName = $album->getAlbumName();
 
             //add data to albums table
-            DB::table('albums')->insert([
+            Album::insert([
                'album_id' => null,
                 'user_id' => Auth::id(),
                 'album_name' => $albumName,
                 'album_year' => $albumYear
             ]);
             //get albumId
-            $albumId = DB::table('albums')->where('user_id', Auth::id())->
+            $albumId = Album::where('user_id', Auth::id())->
                 where('album_name', $albumName)->where('album_year', $albumYear)->pluck('album_id')[0];
 
             foreach ($tracksKeys as $tracksKey) { //put tracks into DB
@@ -94,7 +96,7 @@ class NewAlbumController extends Controller
                         }
                     }
 
-                    DB::table('tracks')->insert([ //put data into tracks table
+                    Track::insert([ //put data into tracks table
                         'track_id' => null,
                         'track_name' => $fileName,
                         'track_path' => $tracksKey . "/" .$filePathName,
@@ -102,14 +104,13 @@ class NewAlbumController extends Controller
                         'track_duration' => $trackDuration,
                     ]);
 
-                    $trackId = DB::table('tracks')-> //get track id
-                        where('track_name', $fileName)
+                    $trackId = Track::where('track_name', $fileName) //get track id
                         ->where('track_path',$tracksKey . "/" .$filePathName)
                         ->where('album_id', $albumId)
                         ->where('track_duration', $trackDuration)
                         ->pluck('track_id')[0];
 
-                    DB::table('m2m_performer_tracks')->insert([ //put data into m2m_performer_tracks table
+                    M2mPerformerTrack::insert([ //put data into m2m_performer_tracks table
                        'm2m_performer_track_id' => null,
                         'track_id' => $trackId,
                         'performer_id' => $performerId
