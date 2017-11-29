@@ -22,7 +22,7 @@ Route::group(['middleware' => ['auth']], function($router) {
     $router->get('/myAlbums', 'MyAlbumsController@index')->name('myAlbums');
     $router->get('/newAlbum', 'NewAlbumController@showNewAlbumForm')->name('newAlbum');
     $router->post('/newAlbum', 'NewAlbumController@createNewAlbum')->name('newAlbum');
-    $router->post('/tracksCount', 'TracksCountController@count')->name('trackCount'); //ajax
+    $router->post('/newAlbum/tracksCount', 'NewAlbumController@count'); //ajax
     $router->get('/editAlbum/{album_id}', ['uses' => 'EditAlbumController@showEditForm']);
     $router->post('/editAlbum/{album_id}', ['uses' => 'EditAlbumController@editAlbum', 'as' => 'edit.album']);
     $router->post('/editAlbum/{album_id}/delete', ['uses' => 'EditAlbumController@delete', 'as' => 'delete.album']);

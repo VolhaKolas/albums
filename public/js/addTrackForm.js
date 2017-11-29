@@ -18,7 +18,7 @@ angular.module('formApp', [])
 
             $http({ //this method sends to server count of inputs for loading files
                 method : "POST",
-                url : "/tracksCount",
+                url : "/newAlbum/tracksCount",
                 data: {'count': count}
             });
         };
