@@ -29,7 +29,7 @@ class EditAlbumController extends Controller
                 ->select('t.track_id AS track_id', 't.track_name AS track_name',
                     't.track_duration AS track_duration', 'p.performer_name AS track_performer')
                 ->where('t.album_id', $id)
-                ->get();
+                ->paginate(10);
 
             return view('editalbum', compact('album', 'tracks', 'key'));
         }

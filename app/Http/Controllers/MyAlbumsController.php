@@ -11,7 +11,7 @@ class MyAlbumsController extends Controller
      */
     public function index() {
         $albums = Album::where('user_id', Auth::id())->
-            select('album_id', 'album_name', 'album_year')->get();
+            select('album_id', 'album_name', 'album_year')->paginate(15);
         return view('myalbums', compact('albums'));
     }
 }

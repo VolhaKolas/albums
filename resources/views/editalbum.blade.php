@@ -96,6 +96,7 @@
                                                 </div>
                                             @endforeach
                                         </div>
+                                        {{ $tracks->links() }}
 
                                         <div class="form-group" id="one-more-track" ng-click="Show()">
                                             <b>+</b> Add one more track

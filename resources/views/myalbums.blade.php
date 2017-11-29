@@ -28,6 +28,7 @@
                     @endforeach
                     </tbody>
                 </table>
+                {{ $albums->links() }}
             </div>
         </div>
     </div>
