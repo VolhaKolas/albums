@@ -17,6 +17,7 @@ class CreatePerformersTable extends Migration
             $table->increments('performer_id');
             $table->string('performer_name', 100);
             $table->unique('performer_name');
+
         });
     }
 

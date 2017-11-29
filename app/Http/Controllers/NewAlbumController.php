@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Album;
 use App\Classes\PerformerId;
+use App\Classes\SecondsToMinutes;
 use App\Http\Requests\NewAlbumRequest;
 use App\M2mPerformerTrack;
 use App\Performer;
@@ -73,16 +74,8 @@ class NewAlbumController extends Controller
 
 
                     $audio = new Mp3Info($filePath . '/' .$filePathName, true); //calculate track duration
-                    $trackDuration = round($audio->duration, 0);
-                    $minutes = floor($trackDuration / 60);
-                    if($minutes < 10) {
-                        $minutes = "0" . $minutes;
-                    }
-                    $seconds = $trackDuration % 60;
-                    if($seconds < 10) {
-                        $seconds = '0' . $seconds;
-                    }
-                    $trackDuration = $minutes . ":" . $seconds;
+                    $trackDurationConvert = new SecondsToMinutes($audio->duration);
+                    $trackDuration = $trackDurationConvert->getConversion();
 
 
                     $fileName = $request->all()['track_name' . $tracksKey]; //create new or take existing file name
@@ -102,20 +95,8 @@ class NewAlbumController extends Controller
                         'track_path' => $tracksKey . "/" .$filePathName,
                         'album_id' => $albumId,
                         'track_duration' => $trackDuration,
-                    ]);
-
-                    $trackId = Track::where('track_name', $fileName) //get track id
-                        ->where('track_path',$tracksKey . "/" .$filePathName)
-                        ->where('album_id', $albumId)
-                        ->where('track_duration', $trackDuration)
-                        ->pluck('track_id')[0];
-
-                    M2mPerformerTrack::insert([ //put data into m2m_performer_tracks table
-                       'm2m_performer_track_id' => null,
-                        'track_id' => $trackId,
                         'performer_id' => $performerId
                     ]);
-
                 }
             }
         }

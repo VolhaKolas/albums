@@ -10,6 +10,7 @@ class Album extends Model
     protected $fillable = [
         'album_id', 'album_name', 'album_year',
     ];
+    public $timestamps = false;
 
     protected $primaryKey = 'user_id';
 

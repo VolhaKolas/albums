@@ -9,6 +9,7 @@ class Track extends Model
     protected $fillable = [
         'track_id', 'track_name', 'track_duration', 'track_path'
     ];
+    public $timestamps = false;
 
     protected $primaryKey = 'album_id';
 
@@ -16,7 +17,7 @@ class Track extends Model
         return $this->belongsTo('App\Album', 'album_id', 'album_id');
     }
 
-    public function m2mPerformerTrack() {
-        return $this->hasMany('App\M2mPerformerTrack', 'track_id', 'track_id');
+    public function performer() {
+        return $this->belongsTo('App\Performer', 'performer_id', 'performer_id');
     }
 }

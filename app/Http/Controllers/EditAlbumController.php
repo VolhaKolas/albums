@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Album;
 use App\Classes\PerformerId;
+use App\Classes\SecondsToMinutes;
 use App\Http\Requests\EditAlbumRequest;
 use App\M2mPerformerTrack;
 use App\Performer;
@@ -18,13 +19,12 @@ class EditAlbumController extends Controller
      * method shows form for edit album
      */
     public function showEditForm($id) {//album id
-        $key = -1; //used for creation new track, value '-1' - if album doesn't have any tracks
+        $key = -1; //used for creation new track, value '-1' - if current album doesn't have any tracks
         $album = Album::where('album_id', $id)->select('album_name', 'album_id', 'album_year')->get(); //current album
         if(count($album) > 0) {
             $album = $album[0];
-            $tracks = DB::table('m2m_performer_tracks AS pt') //tracks in current album
-                ->join('performers AS p', 'pt.performer_id', '=', 'p.performer_id')
-                ->join('tracks AS t', 'pt.track_id', '=', 't.track_id')
+            $tracks = DB::table('performers AS p') //tracks in current album
+                ->join('tracks AS t', 't.performer_id', '=', 'p.performer_id')
                 ->select('t.track_id AS track_id', 't.track_name AS track_name',
                     't.track_duration AS track_duration', 'p.performer_name AS track_performer')
                 ->where('t.album_id', $id)
@@ -58,16 +58,8 @@ class EditAlbumController extends Controller
 
 
             $audio = new Mp3Info($filePath . '/' .$filePathName, true); //calculate track duration
-            $trackDuration = round($audio->duration, 0);
-            $minutes = floor($trackDuration / 60);
-            if($minutes < 10) {
-                $minutes = "0" . $minutes;
-            }
-            $seconds = $trackDuration % 60;
-            if($seconds < 10) {
-                $seconds = '0' . $seconds;
-            }
-            $trackDuration = $minutes . ":" . $seconds;
+            $trackDurationConvert = new SecondsToMinutes($audio->duration);
+            $trackDuration = $trackDurationConvert->getConversion();
 
             $fileName = $request->all()['track_name0']; //create new or take existing file name
             if(null == $fileName){
@@ -86,17 +78,6 @@ class EditAlbumController extends Controller
                 'track_path' => $tracksKey . "/" .$filePathName,
                 'album_id' => $albumId,
                 'track_duration' => $trackDuration,
-            ]);
-
-            $trackId = Track::where('track_name', $fileName)//get track id
-                ->where('track_path',$tracksKey . "/" .$filePathName)
-                ->where('album_id', $albumId)
-                ->where('track_duration', $trackDuration)
-                ->pluck('track_id')[0];
-
-            M2mPerformerTrack::insert([ //put data into m2m_performer_tracks table
-                'm2m_performer_track_id' => null,
-                'track_id' => $trackId,
                 'performer_id' => $performerId
             ]);
         }
@@ -120,7 +101,7 @@ class EditAlbumController extends Controller
             else if(preg_match('/track_performer(\d+)/', $requestKey, $matches)) {//here I edit tracks performer
                 $performerCorrect = new PerformerId($request->all()[$requestKey]);
                 $idPerformer = $performerCorrect->getPerformerId();
-                M2mPerformerTrack::where('track_id', $matches[1])->
+                Track::where('track_id', $matches[1])->
                 update([
                     "performer_id" => $idPerformer
                 ]);
