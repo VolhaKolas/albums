@@ -6,6 +6,7 @@
  * Time: 11:34
  */
 namespace App\Classes;
+use App\Performer;
 use Illuminate\Support\Facades\DB;
 class PerformerId
 {
@@ -26,18 +27,16 @@ class PerformerId
         if(null == $this->performerName) {
             $this->performerName = 'unknown';
         }
-        $performerExistenceCount = DB::table('performers')->
-        where('performer_name', $this->performerName)->pluck('performer_id');
+        $performerExistenceCount = Performer::where('performer_name', $this->performerName)->pluck('performer_id');
         if(count($performerExistenceCount) > 0) {
             $this->performerId = $performerExistenceCount[0];
         }
         else {
-            DB::table('performers')->insert([
+            Performer::insert([
                 'performer_id' => null,
                 'performer_name' => $this->performerName
             ]);
-            $this->performerId = DB::table('performers')->
-            where('performer_name', $this->performerName)->pluck('performer_id')[0];
+            $this->performerId = Performer::where('performer_name', $this->performerName)->pluck('performer_id')[0];
         }
     }
 

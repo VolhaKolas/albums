@@ -76,12 +76,12 @@ class NewAlbumController extends Controller
                     if(file_exists($filePath . '/' . $filePathName)) {
                         try {
                             $audio = new Mp3Info($filePath . '/' . $filePathName, true); //calculate track duration
+                            $trackDurationConvert = new SecondsToMinutes($audio->duration);
+                            $trackDuration = $trackDurationConvert->getConversion();
                         }
                         catch (Exception $e) {
-                            return redirect()->back();
+                            $trackDuration = "00:00";
                         }
-                        $trackDurationConvert = new SecondsToMinutes($audio->duration);
-                        $trackDuration = $trackDurationConvert->getConversion();
                         $fileName = $request->all()['track_name' . $tracksKey]; //create new or take the existing file name
                         if (null == $fileName) {
                             $fileName = $request->file($trackKey)->getClientOriginalName();

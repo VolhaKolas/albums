@@ -31,11 +31,11 @@ class Album
             $this->albumYear = date('Y');
         }
         if(0 == $this->albumId) {
-            $albumNameExistenceCount = DB::table('albums')->where('user_id', Auth::id())->
+            $albumNameExistenceCount = \App\Album::where('user_id', Auth::id())->
             where('album_name', 'like', "$this->albumName%")->where('album_year', $this->albumYear)->count();
         }
         else {
-            $albumNameExistenceCount = DB::table('albums')->where('user_id', Auth::id())
+            $albumNameExistenceCount = \App\Album::where('user_id', Auth::id())
                 ->where('album_id', '!=', $this->albumId)
                 ->where('album_name', 'like', "$this->albumName%")
                 ->where('album_year', $this->albumYear)->count();
