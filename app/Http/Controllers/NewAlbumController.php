@@ -9,6 +9,7 @@ use App\Http\Requests\NewAlbumRequest;
 use App\M2mPerformerTrack;
 use App\Performer;
 use App\Track;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -38,65 +39,69 @@ class NewAlbumController extends Controller
         session(['count' => 1]);
 
         $requestKeys = array_keys($request->all());
-        $tracksKeys = []; //this array consists of tracks numbers which user uploaded
+        $tracksKeys = []; //this array consists of track's numbers which user uploaded
         foreach ($requestKeys as $requestKey) {
             if(preg_match('/track(\d+)/', $requestKey, $matches)) {
                 $tracksKeys = array_merge($tracksKeys, [$matches[1]]);
             }
         }
-        if(count($tracksKeys) > 0) { //if user upload 1 and more tracks
-            $album = new \App\Classes\Album($request->all()['album_name'], $request->all()['album_year']);
+        if(count($tracksKeys) > 0) { //if user upload 1 or more tracks
+            $album = new \App\Classes\Album($request->get('album_name'), $request->get('album_year'));
             $albumYear = $album->getAlbumYear();
             $albumName = $album->getAlbumName();
 
-            //add data to albums table
+            //add data to the albums table
             Album::insert([
                'album_id' => null,
                 'user_id' => Auth::id(),
                 'album_name' => $albumName,
                 'album_year' => $albumYear
             ]);
-            //get albumId
+            //get the albumId
             $albumId = Album::where('user_id', Auth::id())->
-                where('album_name', $albumName)->where('album_year', $albumYear)->pluck('album_id')[0];
+                where('album_name', $albumName)->where('album_year', $albumYear)->pluck('album_id')->first();
 
             foreach ($tracksKeys as $tracksKey) { //put tracks into DB
                 $trackPerformerKey = 'track_performer' . $tracksKey;
-                $performer = new PerformerId($request->all()[$trackPerformerKey]);
-                $performerId = $performer->getPerformerId(); //put performer name if needed into DB and get performer id
+                $performer = new PerformerId($request->get($trackPerformerKey));
+                $performerId = $performer->getPerformerId(); //put the performer name if it's needed into DB and get the performer id
 
                 $trackKey = 'track' . $tracksKey;
-                if($request->hasFile($trackKey)) { //put file with track on server and file data into DB
+                if($request->hasFile($trackKey)) { //put the file with track on server and file data into DB
                     $file = $request->file($trackKey);
                     $filePathName = $request->file($trackKey)->getFilename();
                     $filePath = public_path() . '/tracks/' . Auth::id() . "/" . $albumId . '/' .$tracksKey;
-                    $file->move($filePath); //put file on server
+                    $file->move($filePath); //put the file on server
 
-
-                    $audio = new Mp3Info($filePath . '/' .$filePathName, true); //calculate track duration
-                    $trackDurationConvert = new SecondsToMinutes($audio->duration);
-                    $trackDuration = $trackDurationConvert->getConversion();
-
-
-                    $fileName = $request->all()['track_name' . $tracksKey]; //create new or take existing file name
-                    if(null == $fileName){
-                        $fileName = $request->file($trackKey)->getClientOriginalName();
-                    }
-                    else {
-                        if(!isset(pathinfo($fileName)['extension'])) {
-                            $fileName = $fileName . "." .
-                                pathinfo($request->file($trackKey)->getClientOriginalName())['extension'];
+                    if(file_exists($filePath . '/' . $filePathName)) {
+                        try {
+                            $audio = new Mp3Info($filePath . '/' . $filePathName, true); //calculate track duration
                         }
-                    }
+                        catch (Exception $e) {
+                            return redirect()->back();
+                        }
+                        $trackDurationConvert = new SecondsToMinutes($audio->duration);
+                        $trackDuration = $trackDurationConvert->getConversion();
+                        $fileName = $request->all()['track_name' . $tracksKey]; //create new or take the existing file name
+                        if (null == $fileName) {
+                            $fileName = $request->file($trackKey)->getClientOriginalName();
+                        } else {
+                            if (!isset(pathinfo($fileName)['extension'])) {
+                                $fileName = $fileName . "." .
+                                    pathinfo($request->file($trackKey)->getClientOriginalName())['extension'];
+                            }
+                        }
+                        Track::insert([ //put data into the tracks table
+                            'track_id' => null,
+                            'track_name' => $fileName,
+                            'track_path' => $tracksKey . "/" . $filePathName,
+                            'album_id' => $albumId,
+                            'track_duration' => $trackDuration,
+                            'performer_id' => $performerId
+                        ]);
 
-                    Track::insert([ //put data into tracks table
-                        'track_id' => null,
-                        'track_name' => $fileName,
-                        'track_path' => $tracksKey . "/" .$filePathName,
-                        'album_id' => $albumId,
-                        'track_duration' => $trackDuration,
-                        'performer_id' => $performerId
-                    ]);
+
+                    }
                 }
             }
         }

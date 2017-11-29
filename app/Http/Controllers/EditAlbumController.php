@@ -9,6 +9,7 @@ use App\Http\Requests\EditAlbumRequest;
 use App\M2mPerformerTrack;
 use App\Performer;
 use App\Track;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,10 +20,10 @@ class EditAlbumController extends Controller
      * method shows form for edit album
      */
     public function showEditForm($id) {//album id
-        $key = -1; //used for creation new track, value '-1' - if current album doesn't have any tracks
+        $key = -1; //used for creation new track, value '-1' - if the current album doesn't have any tracks
         $album = Album::where('album_id', $id)->select('album_name', 'album_id', 'album_year')->get(); //current album
         if(count($album) > 0) {
-            $album = $album[0];
+            $album = $album->first();
             $tracks = DB::table('performers AS p') //tracks in current album
                 ->join('tracks AS t', 't.performer_id', '=', 'p.performer_id')
                 ->select('t.track_id AS track_id', 't.track_name AS track_name',
@@ -41,52 +42,55 @@ class EditAlbumController extends Controller
      * method edits album
      */
     public function editAlbum(EditAlbumRequest $request) {
-        $albumId = $request->all()['album_id'];
-        $album = new \App\Classes\Album($request->all()['album_name'], $request->all()['album_year'], $albumId);
+        $albumId = $request->get('album_id');
+        $album = new \App\Classes\Album($request->get('album_name'), $request->get('album_year'), $albumId);
         $albumName = $album->getAlbumName();
         $albumYear = $album->getAlbumYear();
         if($request->hasFile('track0')) { //if tracks0 (new track for upload) issets
             $trackKey = 'track0';
-            $tracksKey= Track::where('album_id', $request->all()['album_id'])->max('track_id') + 1;
-            $performer = new PerformerId($request->all()['track_performer0']);
-            $performerId = $performer->getPerformerId(); //put performer name if needed into DB and get performer id
+            $tracksKey= Track::where('album_id', $request->get('album_id'))->max('track_id') + 1;
+            $performer = new PerformerId($request->get('track_performer0'));
+            $performerId = $performer->getPerformerId(); //put the performer name if it's needed into DB and get the performer id
 
             $file = $request->file($trackKey);
             $filePathName = $request->file($trackKey)->getFilename();
             $filePath = public_path() . '/tracks/' . Auth::id() . "/" . $albumId . '/' .$tracksKey;
             $file->move($filePath); //put file on server
 
-
-            $audio = new Mp3Info($filePath . '/' .$filePathName, true); //calculate track duration
-            $trackDurationConvert = new SecondsToMinutes($audio->duration);
-            $trackDuration = $trackDurationConvert->getConversion();
-
-            $fileName = $request->all()['track_name0']; //create new or take existing file name
-            if(null == $fileName){
-                $fileName = $request->file($trackKey)->getClientOriginalName();
-            }
-            else {
-                if(!isset(pathinfo($fileName)['extension'])) {
-                    $fileName = $fileName . "." .
-                        pathinfo($request->file($trackKey)->getClientOriginalName())['extension'];
+            if(file_exists($filePath . '/' . $filePathName)) {
+                try {
+                    $audio = new Mp3Info($filePath . '/' . $filePathName, true); //calculate track duration
                 }
+                catch (Exception $e) {
+                    return redirect()->back();
+                }
+                $trackDurationConvert = new SecondsToMinutes($audio->duration);
+                $trackDuration = $trackDurationConvert->getConversion();
+                $fileName = $request->get('track_name0'); //create new or take existing file name
+                if (null == $fileName) {
+                    $fileName = $request->file($trackKey)->getClientOriginalName();
+                } else {
+                    if (!isset(pathinfo($fileName)['extension'])) {
+                        $fileName = $fileName . "." .
+                            pathinfo($request->file($trackKey)->getClientOriginalName())['extension'];
+                    }
+                }
+                Track::insert([ //put data into tracks table
+                    'track_id' => null,
+                    'track_name' => $fileName,
+                    'track_path' => $tracksKey . "/" . $filePathName,
+                    'album_id' => $albumId,
+                    'track_duration' => $trackDuration,
+                    'performer_id' => $performerId
+                ]);
             }
-
-            Track::insert([ //put data into tracks table
-                'track_id' => null,
-                'track_name' => $fileName,
-                'track_path' => $tracksKey . "/" .$filePathName,
-                'album_id' => $albumId,
-                'track_duration' => $trackDuration,
-                'performer_id' => $performerId
-            ]);
         }
 
         $requestKeys = array_keys($request->all());
         foreach ($requestKeys as $requestKey) {
             if(preg_match('/checkbox(\d+)/', $requestKey, $matches)) {//here I get checkboxes for tracks to delete
                 $deleteTrackId = $matches[1];
-                $trackPath = Track::where('track_id', $deleteTrackId)->pluck('track_path')[0];
+                $trackPath = Track::where('track_id', $deleteTrackId)->select('track_path')->first();
                 Track::where('track_id', $deleteTrackId)->delete();
                 if(file_exists(public_path() . '/tracks/' . Auth::id() . "/" . $albumId . '/' . $trackPath)) {
                     unlink(public_path() . '/tracks/' . Auth::id() . "/" . $albumId . '/' . $trackPath);//delete track from server
@@ -99,7 +103,7 @@ class EditAlbumController extends Controller
                 ]);
             }
             else if(preg_match('/track_performer(\d+)/', $requestKey, $matches)) {//here I edit tracks performer
-                $performerCorrect = new PerformerId($request->all()[$requestKey]);
+                $performerCorrect = new PerformerId($request->get($requestKey));
                 $idPerformer = $performerCorrect->getPerformerId();
                 Track::where('track_id', $matches[1])->
                 update([
@@ -108,7 +112,7 @@ class EditAlbumController extends Controller
             }
         }
 
-        Album::where('album_id', $albumId)->//here I edit album name and album year
+        Album::where('album_id', $albumId)->//here I edit the album name and the album year
             update([
                 'album_name' => $albumName,
                 'album_year' => $albumYear
@@ -120,11 +124,11 @@ class EditAlbumController extends Controller
      * method deletes album
      */
     public function delete(Request $request) {
-        $albumId = $request->all()['id'];
+        $albumId = $request->get('id');
         Album::where('album_id', $albumId)->delete();
 
         $albumPath = public_path() . '/tracks/' . Auth::id() . "/" . $albumId;
-        if (is_dir($albumPath)) {
+        if (is_dir($albumPath)) { //delete input folders and files
             $folders = scandir($albumPath);
             if(count($folders) >= 2) {
                 foreach($folders as $key1 => $folder){
@@ -141,7 +145,7 @@ class EditAlbumController extends Controller
                     }
                 }
             }
-            rmdir($albumPath);
+            rmdir($albumPath); //delete album folder
         }
         return redirect()->route('myAlbums');
     }
